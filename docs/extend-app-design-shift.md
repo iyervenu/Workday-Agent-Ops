@@ -60,7 +60,7 @@ validators. One is a hand-built approval-routing integration.
    natively. Hand-rolled approval orchestration is precisely what the platform absorbed. Do not rebuild it;
    plan to retire it.
 3. **Twenty-nine pages is the real weight, and much of it exists only because a page was the only
-   interface.** Validators like "validate this sponsor" or "validate this contact" are pure business rules
+   interface.** Validators of the "check this party record against our rules" kind are pure business logic
    and ideal tool candidates — expose them and they become reachable from a chat prompt, an email, or an
    external agent. Conversational intake plus platform-native approval removes the need for a large share of
    the page estate.
