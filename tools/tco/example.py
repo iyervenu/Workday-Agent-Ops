@@ -21,14 +21,17 @@ def today() -> Estimate:
         tenant=TENANT,
         integrations=[
             # Nightly Studio sync: one detail call per worker, every night.
+            # 365 runs -> 365 Integration Events, regardless of record count.
             IntegrationLoad(
                 "nightly worker sync (per-row)",
                 api_calls=(WORKERS + 1) * 365,
+                runs_per_year=365,
             ),
-            # Event-per-transaction downstream notification.
+            # Triggered per transaction: it RUNS 200,000 times, so 200,000 events.
             IntegrationLoad(
-                "HR change notifications (per-event)",
-                integration_events=CHANGES_PER_YEAR,
+                "HR change notifications (per-transaction trigger)",
+                api_calls=CHANGES_PER_YEAR * 2,
+                runs_per_year=CHANGES_PER_YEAR,
             ),
         ],
         agents=[
@@ -43,13 +46,21 @@ def future() -> Estimate:
     return Estimate(
         tenant=TENANT,
         integrations=[
-            # One bulk read per night instead of 25,000 detail calls.
-            IntegrationLoad("nightly worker sync (bulk)", api_calls=365),
-            # Batched hourly pull replaces event-per-transaction.
-            IntegrationLoad("HR change notifications (batched pull)", api_calls=8_760),
+            # One bulk read per night instead of 25,000 detail calls. Same 365 runs.
+            IntegrationLoad(
+                "nightly worker sync (bulk)", api_calls=730, runs_per_year=365
+            ),
+            # Batched nightly, NOT hourly. Frequency is the cost driver here: hourly
+            # would be 8,760 runs (2,190 credits) versus 365 runs (91 credits), for
+            # the same data volume.
+            IntegrationLoad(
+                "HR change notifications (nightly batch)",
+                api_calls=730,
+                runs_per_year=365,
+            ),
             # Analytics reads served from Prism rather than per-row REST.
             # Metering of Prism/Data Cloud reads is UNVERIFIED - see open-questions.md #0.
-            IntegrationLoad("analytics reads via Prism", api_calls=0, exempt=True),
+            IntegrationLoad("analytics reads via Prism", exempt=True),
         ],
         agents=[
             # Rediscovery replicated externally; grading kept delivered (cheap per unit).

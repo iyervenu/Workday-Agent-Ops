@@ -30,9 +30,21 @@ Two layers, often confused:
 | API call | 60 credits / 10,000 | 0.006 |
 | Integration Event | 25 credits / 100 | 0.25 |
 
-**An Integration Event costs ~42× an API call.** Event-per-transaction designs — currently fashionable —
-are the expensive pattern here. This does not mean never use events; it means know the multiple and spend it
-deliberately where timeliness genuinely matters.
+**An Integration Event costs ~42× an API call**, and — crucially — **one Integration Event is raised per
+integration *run*, not per record.** A nightly integration raises 365 events a year whether it moves 10
+records or 10 million. An integration *triggered per transaction* runs once per transaction, so it raises
+one event per transaction.
+
+Two consequences:
+
+- **An integration run costs about 42 API calls simply to exist.** Below ~42 calls per run the event
+  dominates the bill; above it, the calls do. Small, frequent integrations are mostly paying for existing.
+- **Run frequency is a first-class cost driver, independent of data volume.** Hourly instead of nightly is
+  8,760 runs versus 365 — about 2,190 credits versus 91 — for exactly the same data. Ask "how fresh does
+  this genuinely need to be?" before "how do I move this efficiently?"
+
+Per-transaction triggering is therefore the single most expensive pattern available: 200,000 transactions
+becomes 200,000 runs becomes 50,000 credits, before a single API call is counted.
 
 **Rule 2 — the SKU boosts only lift API calls.** Extend +50%, Prism +15%, Financials +15% — additive against
 the baseline, not compounded, and they do **nothing** for Integration Events or storage.
@@ -46,26 +58,33 @@ boosts. Agent allotment **60,000** credits/year.
 
 | Integration | Volume | Credits |
 |---|---|---|
-| Nightly worker sync — one detail call per worker per night | 9,125,365 calls | 54,752 |
-| HR change notifications — one Integration Event per change | 200,000 events | 50,000 |
+| Nightly worker sync — one detail call per worker per night | 9,125,365 calls + 365 runs | 54,843 |
+| HR change notifications — triggered per transaction | 400,000 calls + **200,000 runs** | 52,400 |
 | Recruiting: talent rediscovery, 50 requisitions/month | 600 × 750 cr | 450,000 |
 | Recruiting: candidate grading, 2,000 résumés/month | 24,000 × 6 cr | 144,000 |
 
-Billable after entitlement and allotment: **594,202 credits/yr** (~$59,400 illustrative). The sync alone
-exceeds the entire API entitlement by 1.7M calls, leaving nothing for anything else.
+Billable after entitlement and allotment: **596,693 credits/yr** (~$59,700 illustrative), of which
+**62,693 is integration** and the rest is agent credits. The sync alone exceeds the entire API entitlement
+by 2.1M calls, leaving nothing for anything else; the per-transaction trigger contributes 50,000 credits in
+Integration Events before any call is counted.
 
 ### Future — same business outcomes
 
 | Integration | Volume | Credits |
 |---|---|---|
-| Nightly worker sync — one bulk read per night | 365 calls | 2 |
-| HR change notifications — hourly batched pull | 8,760 calls | 53 |
+| Nightly worker sync — one bulk read per night | 730 calls + 365 runs | 96 |
+| HR change notifications — **nightly batch**, not per transaction | 730 calls + 365 runs | 96 |
 | Analytics reads served from Prism | — | 0 (metering unverified) |
 | Recruiting: candidate grading, kept delivered | 24,000 × 6 cr | 144,000 |
 | Recruiting: talent rediscovery, replicated externally | — | ~144 cr + own inference |
 
-Billable: **84,000 credits/yr** (~$8,400). **API calls fall from 9,125,365 to 9,125** — a 99.9% reduction —
-and the remaining cost is almost entirely agent credits, not integration traffic.
+Billable: **84,182 credits/yr** (~$8,400). Integration cost alone falls from **62,693 credits to 182** — a
+**344× reduction** — and API calls from 9,525,365 to 1,460. What remains is almost entirely agent credits,
+not integration traffic.
+
+Note what did the work: the sync got cheaper by going **bulk** (call pattern), while the notifications got
+cheaper by going **batch** (run frequency). Two different levers, and the second one is invisible if you
+only count API calls.
 
 ### The point for the team
 

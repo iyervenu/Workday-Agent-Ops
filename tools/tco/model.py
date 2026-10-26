@@ -18,13 +18,28 @@ from . import rates
 
 @dataclass
 class IntegrationLoad:
-    """Annual metered volume for one integration."""
+    """Annual metered volume for one integration.
+
+    An Integration Event is raised per integration RUN, not per record. So a nightly
+    integration raises 365 events a year however many records it moves, while an
+    integration triggered per transaction raises one event per transaction - which is
+    why per-transaction triggering is so expensive.
+
+    runs_per_year therefore IS the Integration Event count:
+      nightly batch        -> 365
+      hourly batch         -> 8,760
+      per-transaction      -> one per transaction
+    """
 
     name: str
     api_calls: int = 0
-    integration_events: int = 0
+    runs_per_year: int = 0
     doc_storage_gb: float = 0.0
     exempt: bool = False  # Core Connector, EIB events, Built-on-Workday
+
+    @property
+    def integration_events(self) -> int:
+        return self.runs_per_year
 
     def credits(self) -> float:
         if self.exempt:

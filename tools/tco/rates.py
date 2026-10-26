@@ -44,8 +44,12 @@ CREDITS_PER_API_CALL = API_CREDITS_PER_10K_CALLS / 10_000          # 0.006
 CREDITS_PER_INTEGRATION_EVENT = INTEGRATION_EVENT_CREDITS_PER_100 / 100  # 0.25
 
 # The single most actionable ratio in this file: an Integration Event costs ~42x an
-# API call. Designs should count events far more carefully than calls.
+# API call. Since one event is raised per integration RUN, the practical reading is
+# that an integration run costs about 42 API calls simply to exist - so run FREQUENCY
+# is a first-class cost driver, independent of how much data each run moves.
+# Below ~42 calls per run, the event dominates the bill; above it, the calls do.
 EVENT_TO_CALL_COST_RATIO = CREDITS_PER_INTEGRATION_EVENT / CREDITS_PER_API_CALL
+CALLS_EQUIVALENT_TO_ONE_RUN = EVENT_TO_CALL_COST_RATIO
 
 # ---------------------------------------------------------------------------
 # SKU boosts. VERIFIED 2026-10-26.
