@@ -28,6 +28,18 @@ dates. Do not restate what is already recorded.
 - **`community.workday.com`** developer forums — practitioner discussion
 - **Independent analysis** — erp.today, diginomica, CIO, Josh Bersin — for critical takes and gaps
 
+**Cross-vendor convergence** (secondary priority, but it is the strategic frame — see
+[../cross-vendor-thesis.md](../cross-vendor-thesis.md)). Every quarter or so, or when something notable
+lands, check whether the other vendors are moving the same way:
+
+- **Salesforce** — Agentforce agent management, its own Flex Credits pricing, Data Cloud zero-copy, and
+  reported metering of agentic MCP and API calls
+- **Oracle** — Fusion AI agents, any agent registry, and any consumption-based AI pricing. **Currently
+  unresearched; a first pass here is worth more than another Workday delta.**
+- **Cloud agent layers** — Bedrock AgentCore, Azure AI Foundry, Vertex: agent identity and governance models
+- **MCP and A2A specs** — protocol changes, especially anything moving identity or durability into the
+  protocol, which would undercut the vendor-proprietary layer
+
 Practitioner channels repeatedly carry technical detail (endpoint shapes, auth flows, filter parameters)
 that official product pages omit. Weight them accordingly.
 

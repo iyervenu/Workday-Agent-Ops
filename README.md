@@ -33,21 +33,35 @@ Gaps 1 and 2 are the same system at different maturities — uneven testing is o
 portfolio control plane exists to manage. Gap 4 is the deepest moat for anyone strong on both AWS and
 Workday, but depends on Data Cloud entitlements.
 
+## The wider frame
+
+Workday is not moving alone. Salesforce and Oracle are building the same four layers — an agent registry,
+metered AI consumption, zero-copy open-table data sharing, and MCP as the tool protocol. Each vendor governs
+only its own perimeter, and nobody prices the whole estate in one currency. That cross-vendor gap is larger
+than any single-vendor one, and it is the strategic position: see
+**[docs/cross-vendor-thesis.md](docs/cross-vendor-thesis.md)**.
+
 ## Direction
 
-Start with **domain-correctness evaluation** (gap 2): a scenario suite and runner that produces per-agent
-evidence — *N of N scenarios correct, including every case where the right answer was to refuse*. No licence
-dependency, no reliance on undocumented platform features, and it yields a demonstrable artifact early.
-Grow it into the **portfolio control plane** (gap 1), where that evidence becomes one signal alongside
-ownership, duplication and lifecycle.
+Two assets in flight, both chosen because they produce evidence rather than claims:
+
+- **Consumption and TCO modelling** — [tools/tco/](tools/tco/) turns the metered rate card into arithmetic
+  for integration footprints, agent skill volumes, and delivered-vs-external agent decisions. Run
+  `python -m tools.tco.example` for the worked before/after.
+- **Cross-vendor agent identity and contextual security** — a reference implementation for reaching SaaS
+  data from a cloud-hosted AI experience with user-level context and no SaaS login. This is the problem MCP
+  explicitly declines to solve. Not yet built.
+
+Then: domain-correctness evaluation (gap 2) growing into the portfolio control plane (gap 1).
 
 ## Layout
 
 ```
-docs/research/     verified, source-cited platform notes + live open questions
+docs/research/              verified, source-cited platform notes + live open questions
+docs/cross-vendor-thesis.md the strategic frame
+docs/integration-patterns.md forward design rules, with worked before/after figures
+tools/tco/                  consumption and TCO model
 ```
-
-Infrastructure, harness and scenario corpora land here as the work starts.
 
 ## Conventions
 
