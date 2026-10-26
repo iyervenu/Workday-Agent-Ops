@@ -1,6 +1,26 @@
 # Flex Credits and consumption economics
 
-`VERIFIED 2026-10-26`
+Researched 2026-10-26. **Read the provenance key before quoting any figure externally.**
+
+## Provenance key
+
+Not all figures here are equally solid. This matters if any of it is going in front of a vendor or client.
+
+| Tier | Meaning | Safe to assert? |
+|---|---|---|
+| **W** | Stated in Workday's own published material | Yes, with the source |
+| **R-A** | Reported by reputable press as Workday's own figures (e.g. CIO quoting Workday's rate card) | Yes, attributed as reported |
+| **R-B** | Reported by a **single partner/consultancy blog**, not confirmed against Workday material | **Attribute explicitly, never as fact** |
+| **CALC** | Our arithmetic from tier W/R figures | Yes, if the inputs are stated |
+| **ASSUM** | Our assumption or placeholder | **Never assert — label as an assumption** |
+
+What this means in practice: the **mechanics** (tier W) are solid; the **specific entitlement numbers,
+overage rates, SKU boosts and allotment tables are tier R-B** — a single partner source that we have not
+been able to confirm against Workday's own published material. Treat them as a modelling starting point to
+be replaced by the client's actual contract and entitlement record, not as published pricing.
+
+**Workday publishes no dollar-per-credit rate at all.** Every dollar figure anywhere in this repo is tier
+ASSUM.
 
 **Why this file matters more than it looks.** Custom Extend apps and Orchestrations now draw metered
 platform consumption. That turns run-cost from an invisible subscription detail into a recurring,
@@ -27,6 +47,10 @@ advisory work is worth selling.
   card history, with threshold alerts at **80% / 90% / 100%**.
 
 ## Platform Entitlements vs Flex Credits
+
+**Everything in this section is tier R-B** — one partner source, unconfirmed against Workday material.
+Attribute it as such, and replace it with the client's own entitlement record before modelling anything
+that matters.
 
 Two distinct layers, easy to confuse:
 
@@ -80,7 +104,8 @@ Workday's own connectors and certified Built-on-Workday apps do not.**
 
 ## Published agent rates (Workday's own rate card)
 
-Via CIO's reporting of Workday's rate card:
+**Tier R-A** — CIO reporting these as figures from Workday's own rate card. The strongest numbers in this
+file, and safe to quote with that attribution:
 
 - **Recruiting Agent — 6 credits** to screen and grade each résumé against a job opening
 - **Recruiting Agent — 750 credits per requisition** to identify leads in existing talent pools

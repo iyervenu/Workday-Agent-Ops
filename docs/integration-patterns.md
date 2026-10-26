@@ -30,8 +30,14 @@ Two layers, often confused:
 | API call | 60 credits / 10,000 | 0.006 |
 | Integration Event | 25 credits / 100 | 0.25 |
 
-**An Integration Event costs ~42× an API call**, and — crucially — **one Integration Event is raised per
-integration *run*, not per record.** A nightly integration raises 365 events a year whether it moves 10
+> **Provenance, before this goes to a vendor.** The two overage rates below come from a **single partner
+> blog**, not from Workday's own published material, and we could not confirm them. The per-run Integration
+> Event model matches standard Workday vocabulary and practitioner experience but is **not confirmed for
+> billing purposes** (open question #3b). Use these to shape a design conversation; replace them with the
+> client's actual entitlement record and contract before putting numbers in writing.
+
+**An Integration Event costs ~42× an API call**, and — crucially — **one Integration Event appears to be
+raised per integration *run*, not per record.** A nightly integration raises 365 events a year whether it moves 10
 records or 10 million. An integration *triggered per transaction* runs once per transaction, so it raises
 one event per transaction.
 

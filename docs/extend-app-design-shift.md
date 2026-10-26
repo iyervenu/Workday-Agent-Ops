@@ -4,6 +4,39 @@ Drawn from auditing two real production apps (anonymised here as archetypes). Th
 the app stops being a **destination** and becomes a set of **capabilities** that a page is merely one
 consumer of.
 
+## Read this first: tool-ification is not a run-cost saving
+
+An easy and expensive confusion to make — including in an earlier draft of this document.
+
+**Moving logic from a page into a tool does not by itself reduce run cost.** The savings in the archetypes
+below come from two *independent* changes: moving analytical reads to Prism, and bulking per-row call
+patterns. Both are worth doing whether or not anything becomes a tool.
+
+Three different meters are in play and they differ by orders of magnitude:
+
+| Path | What is metered | Order of cost |
+|---|---|---|
+| Human uses a Workday page | API calls at 0.006 credits each | effectively free |
+| Your own agent calls your own tool | **Assumed** API/entitlement consumption, plus your own cloud inference | pennies |
+| Work routed through a **delivered Workday agent** | Rate card, 1–750 credits *per action* | $0.10 – $75 per action |
+
+The expensive path is the third one — using Workday's delivered agents — not exposing your own logic as
+callable. In fact, tool-ification is the *mechanism* for the arbitrage described in
+[integration-patterns.md](integration-patterns.md): expose your logic as a tool, drive it with your own
+agent on your own cloud, and the AI cost lands on your infrastructure bill where it is roughly two orders of
+magnitude cheaper than Workday's per-action rate.
+
+**But that entire argument rests on one unverified assumption:** that invoking a *custom* tool is metered as
+API consumption rather than at delivered-agent rates. The published rate card prices Workday's own AI agents
+doing AI work — there is no obvious reason Workday would charge inference rates for your business logic, and
+"external AI agents calling the tenant" is described as entitlement consumption. But it is **not
+documented**. See open question #2. If custom tool invocations turn out to be rate-card priced, the
+economics invert and most of this document's advice changes.
+
+**So the honest reason to build a tool is reach, not cost:** one implementation serving several front doors
+instead of being trapped behind one page, and no duplicate build to keep in sync. If humans working inside
+Workday are the only consumer a capability will ever have, **leave it as a page.**
+
 Cost figures use the rate card in [research/flex-credits-economics.md](research/flex-credits-economics.md)
 and the per-run Integration Event model in [integration-patterns.md](integration-patterns.md).
 
@@ -25,17 +58,28 @@ and the per-run Integration Event model in [integration-patterns.md](integration
 page carries **eleven endpoint references**. Matching logic lives in page script. A human eyeballs the
 matches and resolves exceptions.
 
-**The cost problem.** Eleven calls per page load, at 1,000 loads a day, is **~4.0 million API calls a year
-from a single page** — most or all of a mid-size tenant's entire API entitlement, consumed by one screen.
-(Caveat: some of those endpoints likely fire on action rather than load, so treat this as the ceiling and
-measure the real figure in the Platform Consumption Console.)
+**The cost problem — and be careful how this is stated.** What is *measured* is that the page file contains
+eleven endpoint references. Everything beyond that is modelled:
+
+- **Measured:** 11 endpoint references in the page definition.
+- **Not known:** how many fire per page load. Some will be action-triggered rather than load-triggered, so
+  11 is a ceiling, not an observed per-load figure.
+- **Assumed:** a usage rate. At an illustrative 1,000 page loads a day, an 11-call load would be ~4.0M API
+  calls a year — which would be most of a mid-size tenant's entire entitlement from one screen. **That
+  number is an illustration of the shape of the risk, not a measurement.** The real figure comes from the
+  Platform Consumption Console.
+
+The defensible claim is narrow and still useful: *a page carrying double-digit endpoint references has a
+consumption profile nobody has measured, and under metered pricing that is now worth measuring.* Do not
+present the 4M figure as this app's actual consumption.
 
 **How it should be rebuilt:**
 
 1. **Move the read path to Prism.** Reconciliation is a join across two datasets — exactly what Prism and
    Iceberg exist for. The page reads one pre-joined dataset instead of assembling it from eleven calls.
-   Call volume per load collapses from 11 to ~1, an 11× reduction before any other change — and possibly to
-   near-zero cost if Prism reads avoid the API entitlement (unverified, open question #0).
+   Call volume per load drops by roughly the number of endpoints collapsed — and *possibly* to near-zero
+   cost, but only if Prism reads avoid the API entitlement, which is **unverified** (open question #0).
+   Do not promise the saving before that is confirmed.
 2. **Make the matching a tool, not page script.** "Reconcile this statement" becomes a callable capability.
    Same logic then serves the Workday page, a Teams prompt, and an agent, instead of being trapped in one
    PMD.
@@ -46,9 +90,13 @@ measure the real figure in the Platform Consumption Console.)
 
 ## Archetype 2: the request-and-approval app
 
-**As built:** twenty-nine pages, six business objects, seven orchestrations — and **every one of those
-orchestrations contains loop constructs alongside API request nodes.** Several are pure business-rule
-validators. One is a hand-built approval-routing integration.
+**As built:** twenty-nine pages, six business objects, seven orchestrations. Several of the orchestrations
+are pure business-rule validators; one is a hand-built approval-routing integration.
+
+**On the loops — what is and is not known.** A text scan shows loop constructs and API-request nodes
+co-occurring in all seven flows. That is *not* evidence of per-row API calls: loops are also used for data
+shaping, and the scan cannot tell whether a request node sits inside a loop or beside it. The defensible
+statement is that **all seven warrant an individual audit**, not that all seven are inefficient.
 
 **Three distinct problems:**
 
