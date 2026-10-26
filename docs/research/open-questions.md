@@ -7,6 +7,17 @@ Opened 2026-10-25.
 
 ## Highest value
 
+**0. How are Prism and Data Cloud query volumes metered?** `added 2026-10-26`
+Potentially the most commercially useful unknown. Custom Extend apps and Orchestrations draw down metered
+API calls, with overages at 60 credits per 10,000 calls. If reads served from Prism tables or zero-copy
+Iceberg are metered differently — or not at all against the API entitlement — then moving a read path off
+per-row REST becomes a pure cost reduction with no functional change, and "credit-efficient architecture"
+becomes a sellable engagement with arithmetic behind it. No source consulted documents this.
+*Verify:* the Platform Consumption Console's usage-by-component breakdown in a tenant with Prism; whether
+Data Cloud / Live Data Query consumption appears as API calls, a separate component, or a Flex Credit draw;
+the Data Cloud admin guide's consumption section if one exists. See
+[flex-credits-economics.md](flex-credits-economics.md).
+
 **1. Is agent / ASOR telemetry exposed in the Data Cloud Catalog?**
 Decides whether agent-portfolio governance and observability can be built on real data rather than a manual
 registry. Every source checked is silent on agent, audit and telemetry objects; object availability is

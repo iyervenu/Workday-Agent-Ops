@@ -10,7 +10,9 @@ assertions made from memory have already proved wrong here more than once.
 |---|---|
 | [workday-agent-platform.md](workday-agent-platform.md) | ASOR, Agent Gateway, tenant MCP endpoint, Agent-Ready Tools, Custom Agents, Custom Agent Actions, Pipedream, Agent Passport, A2A, partner landscape |
 | [workday-data-cloud.md](workday-data-cloud.md) | Data Cloud, Data Connect, Live Data Query, Data Lake, Prism, Iceberg zero-copy, the AWS integration |
+| [flex-credits-economics.md](flex-credits-economics.md) | Flex Credits, Platform Entitlements, the agent rate card, overage rates — and why custom Extend and Orchestration now carry run-cost |
 | [open-questions.md](open-questions.md) | The live watch list — unresolved questions, each with how to verify |
+| [SWEEP.md](SWEEP.md) | Instructions followed by the scheduled weekly sweep |
 
 ## Conventions
 
