@@ -39,6 +39,18 @@ exists.
 
 ## Platform mechanics
 
+**3b. Exactly what raises a billable Integration Event?** `added 2026-10-26`
+The whole consumption model hinges on this. An Integration Event is raised per integration **run** (not per
+record), which is standard Workday vocabulary and is what practitioner experience confirms — but it is not
+established which execution types raise a *billable* event under the entitlement meter. Classic integrations
+(EIB, Studio, Core Connector, Orchestrate for Integrations) clearly do. **Unknown:** whether an
+Orchestration invoked via `/launch` raises one, and whether ordinary Extend app REST traffic raises one at
+all or is purely API-call metered. If Extend/Orchestration traffic is call-metered only, interactive app
+designs are far cheaper than this model assumes; if each invocation raises an event, they are far more
+expensive.
+*Verify:* the Platform Consumption Console's usage-by-component breakdown after running each execution type
+once in a tenant; the entitlement definitions in the contract or admin guide.
+
 **4. How does Workday's security model actually travel into AWS?**
 Workday claims *"the permission model, business logic, and audit controls travel with the data"* but gives no
 mechanism — no credential exchange, IAM mapping or OAuth detail. Meanwhile it explicitly makes
