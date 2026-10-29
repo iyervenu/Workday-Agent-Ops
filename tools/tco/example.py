@@ -46,9 +46,16 @@ def future() -> Estimate:
     return Estimate(
         tenant=TENANT,
         integrations=[
-            # One bulk read per night instead of 25,000 detail calls. Same 365 runs.
+            # One WQL read per night instead of 25,000 detail calls.
+            #
+            # IMPORTANT: "bulk" has a floor. The REST `limit` parameter maxes at 100
+            # records per call, so a paged-REST bulk read of 25,000 workers is
+            # 250 calls per night = 91,250/yr, not one. WQL's ceiling is 1,000,000
+            # rows, so the same read is a single call. That is why large reads should
+            # use WQL or a report rather than paged REST.
+            # See docs/research/extend-platform-limits.md.
             IntegrationLoad(
-                "nightly worker sync (bulk)", api_calls=730, runs_per_year=365
+                "nightly worker sync (one WQL read)", api_calls=365, runs_per_year=365
             ),
             # Batched nightly, NOT hourly. Frequency is the cost driver here: hourly
             # would be 8,760 runs (2,190 credits) versus 365 runs (91 credits), for

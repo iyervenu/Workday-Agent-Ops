@@ -78,7 +78,7 @@ Integration Events before any call is counted.
 
 | Integration | Volume | Credits |
 |---|---|---|
-| Nightly worker sync — one bulk read per night | 730 calls + 365 runs | 96 |
+| Nightly worker sync — **one WQL read** per night | 365 calls + 365 runs | 93 |
 | HR change notifications — **nightly batch**, not per transaction | 730 calls + 365 runs | 96 |
 | Analytics reads served from Prism | — | 0 (metering unverified) |
 | Recruiting: candidate grading, kept delivered | 24,000 × 6 cr | 144,000 |
@@ -103,8 +103,11 @@ call pattern saves nothing. The business case belongs on the call pattern.
 
 1. **Count the metered units first** — projected API calls and Integration Events per year, before design.
    This is now a required estimate, not an afterthought.
-2. **Can it be bulk?** One call returning N records beats N calls. Biggest single lever by an order of
-   magnitude.
+2. **Can it be bulk — and via what?** One call returning N records beats N calls, the biggest single lever
+   by orders of magnitude. **But "bulk" has a documented floor:** the REST `limit` parameter maxes at **100
+   records per call**, so a paged-REST read of 25,000 records is **250 calls, not one**. WQL's ceiling is
+   **1,000,000 rows**. So for large reads, **use WQL or a report, not paged REST** — same data, 250× fewer
+   calls. See [research/extend-platform-limits.md](research/extend-platform-limits.md).
 3. **Can GraphQL collapse round-trips?** One query replacing several REST calls is one metered call instead
    of several. Caveats: Workday's GraphQL object coverage is partial, and *we have not verified how GraphQL
    is metered* — assume per-query, confirm before relying on it.
